@@ -1,0 +1,8 @@
+*.log
+/mgpusim_uvm
+/mgpusim
+
+/mgpusim_iommu/mgpusim
+/mgpusim_uvm2/mgpusim
+/alltogether/mgpusim
+/v3/mgpusim

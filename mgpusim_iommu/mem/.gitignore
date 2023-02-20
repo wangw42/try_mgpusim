@@ -1,0 +1,20 @@
+# IDE files
+.idea
+
+# Editor files
+.*.swp
+
+# Coverage report
+*.coverprofile
+
+# Vendor
+vendor
+
+# Output files
+*.out
+*.debug
+
+# Python
+.ropeproject
+
+.DS_Store
