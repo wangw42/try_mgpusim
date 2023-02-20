@@ -39,8 +39,8 @@ func convertToBin(num int) string {
 
 var 
 (	
-	IOMMU_BYPASS_FLAG		bool=false // =true means use uvm without iommu
-	UVM_BATCH_FIXED_LATENCY int=2000
+	IOMMU_BYPASS_FLAG		bool=true // =true means use uvm without iommu
+	UVM_BATCH_FIXED_LATENCY int=1800
 	setpagesize				uint64 = 4096
 	mmuset              	int = 64
 	mmuway             	 	int          
@@ -1259,7 +1259,7 @@ func (mmu *MMU) startWalking(req *vm.TranslationReq) {
 
 	
 
-	for p = 1; p < 5; p++{
+	for p = 1; p < 9; p++{
 		if len(tmplocalptw[p]) >= localPTW{
 			//fmt.Println("lenlocalwait", len(tmplocalptw[p]))
 			tmplocal[p] = append(tmplocalptw[p][:localPTW])

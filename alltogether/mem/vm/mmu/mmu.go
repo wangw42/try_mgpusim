@@ -41,7 +41,7 @@ func convertToBin(num int) string {
 var 
 (	
 	IOMMU_BYPASS_FLAG		bool=true // =true means use uvm without iommu
-	UVM_BATCH_FIXED_LATENCY int=1800
+	UVM_BATCH_FIXED_LATENCY int=1200
 	setpagesize				uint64 = 4096
 	mmuset              	int = 64
 	mmuway             	 	int          
@@ -314,6 +314,7 @@ func (mmu *MMU) trace(now sim.VTimeInSec, what string) {
 }
 
 func (mmu *MMU) walkPageTable(now sim.VTimeInSec) bool {
+	//fmt.Println("~~~~~~~~~~~~~~~~~walk len", len(mmu.walkingTranslations))
 	madeProgress := false
 
 	// reset batchwaitingcnt and calculate total wait
@@ -1583,7 +1584,7 @@ func (mmu *MMU) startWalking(req *vm.TranslationReq) {
 		iommuptw_wait = 0
 	}
 
-	
+	//fmt.Println("~~~~~~~~~~~~~~~~~start len", len(mmu.walkingTranslations), mmu.latency)
 	
 }
 
@@ -1614,19 +1615,19 @@ func unique(intSlice []uint64) []uint64 {
 
 func (mmu *MMU) calculateHostWaitLatency (hostThread int) int{
 	os_req_num := 0
-	f_oswait_index := 0
-	for i = 0; i < len(mmu.walkingTranslations); i++{
-		reqtmp := mmu.walkingTranslations[i].req
-		if mmu.walkingTranslations[i].os_handle_flag == true {
+	cal_i := 0
+	for cal_i = 0; cal_i < len(mmu.walkingTranslations); cal_i++{
+		reqtmp := mmu.walkingTranslations[cal_i].req
+		if mmu.walkingTranslations[cal_i].os_handle_flag == true {
 			actual_host_latency := 0
 
-			if reqtmp.Gmmuhit == 1  || mmu.walkingTranslations[i].iommu_tlb_hit_flag != -1 || mmu.walkingTranslations[i].iommupt_hit_flag  == 1{
+			if reqtmp.Gmmuhit == 1  || mmu.walkingTranslations[cal_i].iommu_tlb_hit_flag != -1 || mmu.walkingTranslations[cal_i].iommupt_hit_flag  == 1{
 				actual_host_latency = 0
 			} else {
 				if IOMMU_BYPASS_FLAG == true || mmu.walkingTranslations[i].direct_os_flag == true  {
-					actual_host_latency = mmu.walkingTranslations[i].cycleLeft - (2*pcie) - mmu.walkingTranslations[i].locallevel*2 - mmu.walkingTranslations[i].localwait - mmu.walkingTranslations[i].oswait
+					actual_host_latency = mmu.walkingTranslations[cal_i].cycleLeft - (2*pcie) - mmu.walkingTranslations[cal_i].locallevel*2 - mmu.walkingTranslations[cal_i].localwait - mmu.walkingTranslations[cal_i].oswait
 				}else {
-					actual_host_latency = mmu.walkingTranslations[i].cycleLeft - (2*pcie) - mmu.walkingTranslations[i].locallevel*2 - mmu.walkingTranslations[i].localwait - mmu.walkingTranslations[i].iowait - mmu.walkingTranslations[i].iolevel - mmu.walkingTranslations[i].oswait
+					actual_host_latency = mmu.walkingTranslations[cal_i].cycleLeft - (2*pcie) - mmu.walkingTranslations[cal_i].locallevel*2 - mmu.walkingTranslations[cal_i].localwait - mmu.walkingTranslations[cal_i].iowait - mmu.walkingTranslations[cal_i].iolevel - mmu.walkingTranslations[cal_i].oswait
 				}
 				
 			}
@@ -1643,7 +1644,7 @@ func (mmu *MMU) calculateHostWaitLatency (hostThread int) int{
 	}
 	fmt.Println("+++==+++++os_req_num", os_req_num, "oswait", oswait)
 
-	// oswait := 0
+	// oswait := cal_0
 
 	return oswait
 }
