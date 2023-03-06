@@ -40,8 +40,8 @@ func convertToBin(num int) string {
 
 var 
 (	
-	UVM_BATCH_FIXED_LATENCY int=1000
-	ENABLE_DIRECT_OS		bool=true// false = iommu, true = ideal
+	UVM_BATCH_FIXED_LATENCY int=600
+	ENABLE_DIRECT_OS		bool=false// false = iommu, true = ideal
 	setpagesize				uint64 = 4096
 	mmuset              	int = 64
 	mmuway             	 	int          
@@ -160,7 +160,7 @@ var
 	// host side
 	hostPageTable 			vm.PageTable=vm.NewPageTable(12)
 	tmp_os_flag				bool
-	hostThread				int=32
+	hostThread				int=16
 
 	// iommu fake tlb, used to decide batch
 	iommuPageTable 			vm.PageTable=vm.NewPageTable(12)
@@ -1179,8 +1179,11 @@ func (mmu *MMU) startWalking(req *vm.TranslationReq) {
 			if mmu.walkingTranslations[i].iommu_tlb_hit_flag != -1 {
 				ioactuallatency = mmu.walkingTranslations[i].cycleLeft  - (2*pcie)  - (mmu.walkingTranslations[i].locallevel*2)
 			} else {
+				//trick io 0219
+				// ioactuallatency = mmu.walkingTranslations[i].cycleLeft  - (2*pcie)  - (mmu.walkingTranslations[i].locallevel*2) - mmu.walkingTranslations[i].localwait
+				
 				// trick io
-				ioactuallatency = mmu.walkingTranslations[i].cycleLeft  - (2*pcie)  - (mmu.walkingTranslations[i].locallevel*2) - mmu.walkingTranslations[i].localwait
+				ioactuallatency = mmu.walkingTranslations[i].cycleLeft  - (pcie)  - (mmu.walkingTranslations[i].locallevel*2) 
 				// real io
 				//ioactuallatency = mmu.walkingTranslations[i].cycleLeft  - (2*pcie)  - (mmu.walkingTranslations[i].locallevel*2) - mmu.walkingTranslations[i].localwait  - mmu.walkingTranslations[i].iowait 
 			}

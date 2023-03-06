@@ -158,7 +158,7 @@ var
 	// host side
 	hostPageTable 			vm.PageTable=vm.NewPageTable(12)
 	tmp_os_flag				bool=false
-	hostThread				int=32
+	hostThread				int=16
 
 
 	// batch related 
